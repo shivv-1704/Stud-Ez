@@ -1,1 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudEz AI</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0f0f11;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: center;
+        }
+        h1 { font-size: 2.5rem; font-weight: 700; letter-spacing: -1px; }
+        textarea {
+            width: 100%;
+            height: 120px;
+            background-color: #1a1a1e;
+            border: 1px solid #2e2e34;
+            border-radius: 12px;
+            padding: 16px;
+            color: #fff;
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+        }
+        textarea:focus { border-color: #555560; }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #2b2b30;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #3b3b42; }
+        button:disabled { background-color: #1f1f24; color: #666; cursor: not-allowed; }
+        .solution-box {
+            display: none;
+            background-color: #1a1a1e;
+            border: 1px solid #2e2e34;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
 
+    <div class="container">
+        <h1>StudEz AI</h1>
+        <textarea id="questionInput" placeholder="Paste your calculus problem (e.g., ∫ x sin(x) dx)..."></textarea>
+        <button id="solveBtn" onclick="submitProblem()">Solve Step-by-Step</button>
+        <div id="solutionBox" class="solution-box"></div>
+    </div>
+
+    <script>
+        async function submitProblem() {
+            const question = document.getElementById("questionInput").value.trim();
+            const btn = document.getElementById("solveBtn");
+            const solutionBox = document.getElementById("solutionBox");
+
+            if (!question) {
+                alert("Please enter a calculus problem.");
+                return;
+            }
+
+            // UI Loading state
+            btn.disabled = true;
+            btn.innerText = "Solving...";
+            solutionBox.style.display = "block";
+            solutionBox.innerText = "Analyzing problem and generating step-by-step breakdown...";
+
+            // REPLACE THIS URL WITH YOUR MAKE.COM WEBHOOK URL
+            const webhookUrl = "YOUR_MAKE_WEBHOOK_URL_HERE";
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question: question })
+                });
+
+                if (!response.ok) throw new Error("Server error");
+
+                const data = await response.text();
+                solutionBox.innerText = data;
+            } catch (err) {
+                solutionBox.innerText = "An error occurred while fetching the solution. Please check your connection or webhook settings.";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Solve Step-by-Step";
+            }
+        }
+    </script>
+
+</body>
+</html>
